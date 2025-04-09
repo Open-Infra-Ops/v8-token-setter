@@ -13,16 +13,28 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import datetime
 import os
 import time
+import json
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+TokenPath = "/vault/secrets/config.json"
+
+if not os.path.exists(TokenPath):
+    print("config no found, exit...")
+    sys.exit()
+
+with open(os.path.expanduser(TokenPath), "r") as secret:
+    Config_Map = json.load(secret)
+
+os.remove(TokenPath)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', '')
+SECRET_KEY = Config_Map.get('SECRET_KEY', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -203,3 +215,5 @@ LOGGING = {
         },
     }
 }
+
+CONFIG = Config_Map

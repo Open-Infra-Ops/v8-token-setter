@@ -4,15 +4,17 @@ import requests
 import sys
 from socket import gaierror
 from obs import ObsClient
+from django.conf import settings
 
 
 logger = logging.getLogger('log')
+Config = settings.CONFIG
 
 
 def connect_obs_client():
-    access_key_id = os.getenv('ACCESS_KEY_ID', '')
-    secret_access_key = os.getenv('SECRET_ACCESS_KEY', '')
-    endpoint = os.getenv('OBS_ENDPOINT', '')
+    access_key_id = Config.get('ACCESS_KEY_ID', '')
+    secret_access_key = Config.get('SECRET_ACCESS_KEY', '')
+    endpoint = Config.get('OBS_ENDPOINT', '')
     obs_client = ObsClient(access_key_id=access_key_id,
                            secret_access_key=secret_access_key,
                            server='https://{}'.format(endpoint))
@@ -37,8 +39,8 @@ def refresh(obs_client, refresh_token):
 
 
 def get_metadata(obs_client):
-    bucket_name = os.getenv('OBS_BUCKETNAME', '')
-    object_key = os.getenv('OBS_OBJECT_KEY', '')
+    bucket_name = Config.get('OBS_BUCKETNAME', '')
+    object_key = Config.get('OBS_OBJECT_KEY', '')
     access_token, refresh_token = '', ''
     try:
         metadata = obs_client.getObjectMetadata(bucket_name, object_key)
@@ -59,8 +61,8 @@ def get_metadata(obs_client):
 
 
 def set_metadata(obs_client, access_token, refresh_token):
-    bucket_name = os.getenv('OBS_BUCKETNAME', '')
-    object_key = os.getenv('OBS_OBJECT_KEY', '')
+    bucket_name = Config.get('OBS_BUCKETNAME', '')
+    object_key = Config.get('OBS_OBJECT_KEY', '')
     metadata = {
         'access_token': access_token,
         'refresh_token': refresh_token
